@@ -1,0 +1,21 @@
+# Build artifacts
+injector
+*.o
+*.skel.h
+vmlinux.h
+
+# Local kernel files (Device specific)
+vmlinux
+
+# Toolchain helpers (Too large for git)
+bpftool_bin
+
+# Temp/Editor files
+.DS_Store
+.vscode/
+
+# NDK/JNI artifacts
+libs/
+obj/
+bin/
+gen/
