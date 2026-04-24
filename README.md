@@ -1,6 +1,6 @@
 # AndroGhostInjector 👻🤖
 
-An advanced, **ptrace-less** shared library injector for modern ARM64 Android systems (Android 10 - 15). 
+An advanced, **ptrace-less** shared library injector for modern ARM64 Android systems (Android 10 - 16). 
 This tool utilizes eBPF to precisely capture the Zygote fork specialization of an Android application, and seamlessly forces the process to load a custom Agent payload (`.so`) using an in-memory "Executable Cave Trampoline"—bypassing standard debugging and memory integrity SDKs.
 
 ## 🚀 Features
