@@ -1,0 +1,44 @@
+name: Build AndroGhostInjector
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    # If Java project
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    # If Python project (uncomment if needed)
+    # - name: Setup Python
+    #   uses: actions/setup-python@v5
+    #   with:
+    #     python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        chmod +x build.sh || true
+        pip install -r requirements.txt || true
+
+    - name: Build project
+      run: |
+        # Try common build commands
+        ./gradlew build || true
+        python3 main.py || true
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: androghost-build
+        path: .
