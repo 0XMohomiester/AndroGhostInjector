@@ -2,7 +2,7 @@ name: Build AndroGhostInjector
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -10,35 +10,53 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-    # If Java project
-    - name: Setup Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
 
-    # If Python project (uncomment if needed)
-    # - name: Setup Python
-    #   uses: actions/setup-python@v5
-    #   with:
-    #     python-version: '3.11'
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
 
-    - name: Install dependencies
-      run: |
-        chmod +x build.sh || true
-        pip install -r requirements.txt || true
+      - name: Accept licenses
+        run: yes | sdkmanager --licenses
 
-    - name: Build project
-      run: |
-        # Try common build commands
-        ./gradlew build || true
-        python3 main.py || true
+      - name: Install required SDK components
+        run: |
+          sdkmanager "platform-tools" \
+                     "platforms;android-33" \
+                     "build-tools;33.0.2"
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: androghost-build
-        path: .
+      - name: Make gradlew executable
+        run: chmod +x gradlew || true
+
+      - name: Build project
+        run: |
+          if [ -f gradlew ]; then
+            ./gradlew build
+          else
+            echo "No Gradle project, skipping..."
+          fi
+
+      # If repo uses native (NDK) build
+      - name: Build native code (if exists)
+        run: |
+          if [ -f "jni/Android.mk" ] || [ -d "cpp" ]; then
+            echo "Building native libs..."
+            ndk-build || true
+          fi
+
+      - name: Package artifact
+        run: |
+          mkdir output
+          cp -r ./* output/ || true
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AndroGhostInjector-build
+          path: output/
